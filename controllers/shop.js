@@ -25,9 +25,9 @@ exports.getProducts = (req, res, next) => {
       path: '/products'
     });
   })
-  .catch(err => {
-    console.log(err);
-  });
+    .catch(err => {
+      console.log(err);
+    });
 };
 
 exports.getProduct = (req, res, next) => {
@@ -45,13 +45,13 @@ exports.getProduct = (req, res, next) => {
   .catch(err => console.log(err));*/
   Product.findByPk(prodId)
     .then(product => {
-    res.render('shop/product-detail', {
-      product: product,
-      pageTitle: product.title,
-      path: '/products'
-    });
-  })
-  .catch(err => console.log(err));
+      res.render('shop/product-detail', {
+        product: product,
+        pageTitle: product.title,
+        path: '/products'
+      });
+    })
+    .catch(err => console.log(err));
 };
 
 exports.getIndex = (req, res, next) => {
@@ -62,30 +62,25 @@ exports.getIndex = (req, res, next) => {
       path: '/'
     });
   })
-  .catch(err => {
-    console.log(err);
-  });
+    .catch(err => {
+      console.log(err);
+    });
 }
 
 exports.getCart = (req, res, next) => {
-  Cart.getCart(cart => {
-      Product.fetchAll(products => {
-        const cartProducts = [];
-        for (product of products) {
-          const cartProductData = cart.products.find(
-            prod => prod.id === product.id
-          );
-          if(cartProductData) {
-            cartProducts.push({productData: product, qty: cartProductData.qty});
-          }
-        }
-        res.render('shop/cart', {
-            pageTitle: 'Your Cart',
-            path: '/cart',
-            products: cartProducts
-        });
+  req.user
+    .getCart()
+    .then(cart => {
+      return cart.getProducts();
+    })
+    .then(products => {
+      res.render('shop/cart', {
+        pageTitle: 'Your Cart',
+        path: '/cart',
+        products: cartProducts
       });
-  });
+    })
+    .catch(err => console.log(err));
 }
 
 exports.postCart = (req, res, next) => {
@@ -106,10 +101,10 @@ exports.postCartDeleteProduct = (req, res, next) => {
 
 exports.getOrders = (req, res, next) => {
   Product.fetchAll((products => {
-      res.render('shop/orders', {
-          pageTitle: 'Your Orders',
-          path: '/orders'
-      });
+    res.render('shop/orders', {
+      pageTitle: 'Your Orders',
+      path: '/orders'
+    });
   }))
 };
 
