@@ -87,27 +87,12 @@ exports.getProducts = (req, res, next) => {
         });
 }
 
-// exports.getDeleteProduct = (req, res, next) => {
-//     const prodId = req.body.productId;
-//     Product.findById(prodId, product => {
-//         if (!product) {
-//             return res.redirect('/admin/products');
-//         }
-//         res.render('admin/edit-product', {
-//             product: product,
-//             pageTitle: 'Edit Product',
-//             path: '/admin/edit-product',
-//             editing: editMode
-//         });
-//     });
-// }
-
-// exports.postDeleteProduct = (req, res, next) => {
-//     const prodId = req.body.productId;
-//     Product.destroy({ where: { id: prodId } })
-//         .then(result => {
-//             console.log('Destroyed product.');
-//             res.redirect('/admin/products');
-//         })
-//         .catch(err => console.log(err));
-// };
+exports.postDeleteProduct = (req, res, next) => {
+    const prodId = req.body.productId;
+    Product.deleteById(prodId)
+        .then(() => {
+            console.log('Destroyed product.');
+            res.redirect('/admin/products');
+        })
+        .catch(err => console.log(err));
+};
