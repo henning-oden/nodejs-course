@@ -32,7 +32,7 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-mongoose.connect('mongodb+srv://henning-user:Dr4G0nW1n@cluster0.o3hei.mongodb.net/shop?retryWrites=true&w=majority')
+mongoose.connect('redacted')
 .then(result => {
   app.listen(3000);
 }).catch(err => {
