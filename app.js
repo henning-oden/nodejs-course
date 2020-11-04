@@ -33,4 +33,4 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-db.connect();
+db.connect(app);
