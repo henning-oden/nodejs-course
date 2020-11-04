@@ -75,6 +75,22 @@ class User {
             );
     }
 
+    addOrder() {
+        const db = getDb();
+        return db // This return statement was initially dropped, causing TypeError in shop.js:120:5
+            .collection('orders')
+            .insertOne(this.cart)
+            .then(result => {
+                this.cart = { items: [] };
+                return db
+                    .collection('users')
+                    .updateOne(
+                        { _id: new mongodb.ObjectId(this._id) },
+                        { $set: { cart: { items: [] } } }
+                    );
+            });
+    }
+
     static findById(userId) {
         const db = getDb();
         return db
