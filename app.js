@@ -18,21 +18,21 @@ const shopRoutes = require('./routes/shop');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use((req, res, next) => {
-  User.findById('5fa17c61c774ecff1ab7bf74')
-    .then(user => {
-      req.user = new User(user.name, user.email, user.cart, user._id);
-      next();
-    })
-    .catch(err => console.log(err));
-});
+// app.use((req, res, next) => {
+//   User.findById('5fa17c61c774ecff1ab7bf74')
+//     .then(user => {
+//       req.user = new User(user.name, user.email, user.cart, user._id);
+//       next();
+//     })
+//     .catch(err => console.log(err));
+// });
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-mongoose.connect('mongodb+srv://henning-user:Dr4G0nW1n@cluster0.o3hei.mongodb.net/test?retryWrites=true&w=majority')
+mongoose.connect('mongodb+srv://henning-user:Dr4G0nW1n@cluster0.o3hei.mongodb.net/shop?retryWrites=true&w=majority')
 .then(result => {
   app.listen(3000);
 }).catch(err => {
