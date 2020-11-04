@@ -3,6 +3,7 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const db = require('./util/database');
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
@@ -32,9 +33,4 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-mongoose.connect('mongodb+srv://henning-user:Dr4G0nW1n51@cluster0.o3hei.mongodb.net/shop?retryWrites=true&w=majority')
-.then(result => {
-  app.listen(3000);
-}).catch(err => {
-  console.log(err);
-});
+db.connect();
