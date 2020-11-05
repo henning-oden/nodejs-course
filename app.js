@@ -33,4 +33,9 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-db.connect(app);
+db.connect(app)
+    .then(result => {
+        app.listen(3000);
+    }).catch(err => {
+        console.log(err);
+    });;
