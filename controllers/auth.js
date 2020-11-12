@@ -151,7 +151,7 @@ exports.postReset = (req, res, next) => {
         User.findOne({email: req.body.email})
             .then(user => {
                 if (!user) {
-                    return Promise.resolve(req.flash('error', 'User with this email already exists.'))
+                    return Promise.resolve(req.flash('error', 'User with this email not found.'))
                     .then(result => {
                         return req.session.save(err => {
                             res.redirect('/reset');
