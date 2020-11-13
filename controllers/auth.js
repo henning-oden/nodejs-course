@@ -25,6 +25,11 @@ exports.getLogin = (req, res, next) => {
         path: '/login',
         pageTitle: 'Login',
         errorMessage: message,
+        oldInput: {
+            email: '',
+            password: ''
+        },
+        validationErrors: []
     });
 }
 
@@ -58,19 +63,30 @@ exports.postLogin = (req, res, next) => {
             res.render('auth/login', {
                 path: '/login',
                 pageTitle: 'Login',
-                errorMessage: errors.array()[0].msg
+                errorMessage: errors.array()[0].msg,
+                oldInput: {
+                    email: email,
+                    password: password
+                },
+                validationErrors: errors.array()
             })
         );
     }
     User.findOne({ email: email })
         .then(user => {
             if (!user) {
-                return Promise.resolve(req.flash('error', 'Invalid email or password.'))
-                    .then(result => {
-                        return req.session.save(err => {
-                            res.redirect('/login');
-                        });
+                return req.session.save(err => {
+                    res.status(422).render('auth/login', {
+                        path: '/login',
+                        pageTitle: 'Login',
+                        errorMessage: 'Invalid email or password',
+                        oldInput: {
+                            email: email,
+                            password: password
+                        },
+                        validationErrors: []
                     });
+                });
             }
             bcrypt.compare(password, user.password)
                 .then(doMatch => {
@@ -82,10 +98,16 @@ exports.postLogin = (req, res, next) => {
                             res.redirect('/');
                         })
                     }
-                    return Promise.resolve(req.flash('error', 'Invalid email or password.'))
-                    .then(result => {
-                        return req.session.save(err => {
-                            res.redirect('/login');
+                    return req.session.save(err => {
+                        res.status(422).render('auth/login', {
+                            path: '/login',
+                            pageTitle: 'Login',
+                            errorMessage: 'Invalid email or password.',
+                            oldInput: {
+                                email: email,
+                                password: password
+                            },
+                            validationErrors: []
                         });
                     });
                 })
@@ -96,6 +118,8 @@ exports.postLogin = (req, res, next) => {
         })
         .catch(err => console.log(err));
 }
+
+
 
 exports.postSignup = (req, res, next) => {
     const email = req.body.email;
@@ -182,15 +206,15 @@ exports.postReset = (req, res, next) => {
             return res.redirect('/reset');
         }
         const token = buffer.toString('hex');
-        User.findOne({email: req.body.email})
+        User.findOne({ email: req.body.email })
             .then(user => {
                 if (!user) {
                     return Promise.resolve(req.flash('error', 'User with this email not found.'))
-                    .then(result => {
-                        return req.session.save(err => {
-                            res.redirect('/reset');
+                        .then(result => {
+                            return req.session.save(err => {
+                                res.redirect('/reset');
+                            });
                         });
-                    });
                 }
                 user.resetToken = token;
                 user.resetTokenExpiration = Date.now() + 3600000;
@@ -198,18 +222,18 @@ exports.postReset = (req, res, next) => {
             })
             .then(result => {
                 res.redirect('/');
-                    transporter.sendMail({
-                        to: req.body.email,
-                        from: 'henning.oden@outlook.com',
-                        subject: 'Password reset',
-                        html: `
+                transporter.sendMail({
+                    to: req.body.email,
+                    from: 'henning.oden@outlook.com',
+                    subject: 'Password reset',
+                    html: `
                         <p>You requested a password reset</p>
                         <p>Click this <a href="http://localhost:3000/reset/${token}">link</a> to set a new password.</p>
                         `
-                    })
+                })
             })
             .catch(err => {
-            console.log(err);
+                console.log(err);
             })
     })
 }
@@ -217,7 +241,7 @@ exports.postReset = (req, res, next) => {
 exports.getNewPassword = (req, res, next) => {
     const token = req.params.token;
     User.findOne({
-        resetToken: token, 
+        resetToken: token,
         resetTokenExpiration: {
             $gt: Date.now()
         }
@@ -249,7 +273,7 @@ exports.postNewPassword = (req, res, next) => {
     let resetUser;
 
     User.findOne({
-        resetToken: passwordToken, 
+        resetToken: passwordToken,
         resetTokenExpiration: {
             $gt: Date.now()
         },
