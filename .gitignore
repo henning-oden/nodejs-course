@@ -2,3 +2,4 @@ node_modules
 util/database.js
 util/sendgrid.js
 images
+data/invoices
