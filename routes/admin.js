@@ -31,8 +31,6 @@ router.post('/edit-product',
     body('title')
         .isString()
         .isLength({ min: 3 }),
-    check('imageUrl', 'Please enter a valid url.')
-        .isURL(),
     check('price')
         .isFloat()
         .custom(value => {
