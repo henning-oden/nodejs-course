@@ -3,3 +3,4 @@ util/database.js
 util/sendgrid.js
 images
 data/invoices
+util/stripe.js
