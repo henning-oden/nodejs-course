@@ -1,25 +1,50 @@
-const path = require('path');
-
 const express = require('express');
+const { check, body } = require('express-validator/check');
 
 const adminController = require('../controllers/admin');
+const isAuth = require('../middleware/is-auth');
 
 const router = express.Router();
 
 // /admin/add-product => GET
-router.get('/add-product', adminController.getAddProduct);
+router.get('/add-product', isAuth, adminController.getAddProduct);
+
+// /admin/products => GET
+router.get('/products', isAuth, adminController.getProducts);
 
 // /admin/add-product => POST
-router.post('/add-product', adminController.postAddProduct);
+router.post('/add-product',
+    body('title')
+        .isString()
+        .isLength({ min: 3 }),
+    check('price')
+        .isFloat(),
+    body('description')
+        .trim()
+        .isLength({ min: 5, max: 400 }),
+    isAuth,
+    adminController.postAddProduct);
 
-router.get('/edit-product/:productId', adminController.getEditProduct);
+router.get('/edit-product/:productId', isAuth, adminController.getEditProduct);
 
-router.post('/edit-product', adminController.postEditProduct);
+router.post('/edit-product',
+    body('title')
+        .isString()
+        .isLength({ min: 3 }),
+    check('price')
+        .isFloat()
+        .custom(value => {
+            if (value < 0) {
+                throw 'Please enter a positive price.'
+            }
+            return true;
+        }),
+    body('description')
+        .trim()
+        .isLength({ min: 5, max: 400 }),
+    isAuth,
+    adminController.postEditProduct);
 
-router.get('/delete-product/:productId', adminController.getDeleteProduct);
-
-router.post('/delete-product', adminController.postDeleteProduct);
-
-router.get('/products', adminController.getProducts);
+router.delete('/product/:productId', isAuth, adminController.deleteProduct);
 
 module.exports = router;
